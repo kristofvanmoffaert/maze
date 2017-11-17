@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+	  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Maze</title>
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+<script type='text/javascript' src="http://code.highcharts.com/highcharts.js"></script>
+<script type='text/javascript' src="http://code.highcharts.com/modules/exporting.js"></script>
+<script type='text/javascript' src="maze.js"></script>
+  <script src="jquery-ui-1.12.1.custom/jquery-1.12.4.js"></script>
+  <script src="jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+<script src="blockly_compressed.js"></script>
+    <script src="blocks_compressed.js"></script>
+    <script src="msg/js/en.js"></script>
+    <script src="javascript_compressed.js"></script>
+    <script src="acorn_interpreter.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+<body>
+<div id='div1' onload="resizeCanvas();">
+<canvas id="GameBoardCanvas" width='500px' height='500px' >
+</canvas>
+
+
+
+ 
+    <!-- <button onclick="runJS()">Run Code</button> -->
+    
+    <div class="button -green center" onclick="runJS()">Run code</div>
+ 
+
+  
+    <!-- <button onclick="reset()">Reset</button> -->
+      <div class="button -salmon center" onclick="reset()">Reset</div>
+ 
+
+<div class="info" style="display:none" id='info-box'>Info message</div>
+<div class="success" style="display:none" id='success-box'>Successful operation message</div>
+<div class="warning" style="display:none" id='warning-box'>Warning message</div>
+<div class="error" style="display:none" id='error-box' >Error message</div>
+
+</div>
+
+<script>
+
+function resizeCanvas() {
+    var canvs = document.getElementById("GameBoardCanvas");
+    canvs.width = window.innerWidth/2;
+    canvs.height = window.innerHeight;
+	draw();
+}
+
+function runJS() {
+	/*
+    Blockly.JavaScript.addReservedWords('code');
+    var code = Blockly.JavaScript.workspaceToCode();
+    //alert(code);
+    try {
+      eval(code);
+    } catch (e) {
+      alert(e);
+    }
+    */
+	//var interpreter = new Interpreter(code, Maze.initInterpreter);
+  window.LoopTrap = 2000;
+  //Blockly.JavaScript.INFINITE_LOOP_TRAP = 'if(--window.LoopTrap == 0) throw "Infinite loop.";\n';
+	var code = Blockly.JavaScript.workspaceToCode(workspace);
+	console.log(code);
+	var myInterpreter = new Interpreter(code, initInterpreter);
+	//Blockly.JavaScript.INFINITE_LOOP_TRAP = null
+  
+
+  var counter = 0;
+  function nextStep() {
+        try {
+        if (myInterpreter.step()) {
+          counter+=1;
+          console.log(counter);
+          if (counter < window.LoopTrap) {
+              window.setTimeout(nextStep, 30);
+              
+            }
+          else {
+            throw "Infinite Loop!"
+          }
+        }
+      }
+  catch (e) {
+        //alert(e);
+        console.log(e)
+    }
+  } 
+  
+	nextStep();
+  
+	/*
+	try {
+	    var ticks = 1000;  // 10k ticks runs Pegman for about 8 minutes.
+	    while (myInterpreter.step()) {
+	    	window.setTimeout(nextStep, 30);
+	      if (ticks-- == 0) {
+	        throw Infinity;
+	      }
+	    }
+    } catch (e) {
+    // A boolean is thrown for normal termination.
+	    // Abnormal termination is a user error.
+	    if (e === Infinity) {
+	      console.log('infinity')
+  }
+}
+
+*/
+
+
+
+  }
+</script>
+
+     <div id="blocklyDiv" style="height: 480px; width: 600px;">
+
+
+</div>
+<xml id="toolbox" style="display: none">
+  <category name="Logic">
+    <block type="controls_if"></block>
+    <block type="logic_compare"></block>
+    <block type="logic_operation"></block>
+    <block type="logic_negate"></block>
+    <block type="logic_boolean"></block>
+    <block type="logic_null"></block>
+    <block type="logic_ternary"></block>
+  </category>
+  <category name="Loops">
+    <block type="controls_repeat_ext">
+      <value name="TIMES">
+        <block type="math_number">
+          <field name="NUM">10</field>
+        </block>
+      </value>
+    </block>
+    <block type="controls_whileUntil"></block>
+    <block type="controls_for">
+      <value name="FROM">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+      <value name="TO">
+        <block type="math_number">
+          <field name="NUM">10</field>
+        </block>
+      </value>
+      <value name="BY">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+    </block>
+    <block type="controls_forEach"></block>
+    <block type="controls_flow_statements"></block>
+  </category>
+  <category name="Math">
+    <block type="math_number"></block>
+    <block type="math_arithmetic"></block>
+    <block type="math_single"></block>
+    <block type="math_trig"></block>
+    <block type="math_constant"></block>
+    <block type="math_number_property"></block>
+    <block type="math_change">
+      <value name="DELTA">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+    </block>
+    <block type="math_round"></block>
+    <block type="math_on_list"></block>
+    <block type="math_modulo"></block>
+    <block type="math_constrain">
+      <value name="LOW">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+      <value name="HIGH">
+        <block type="math_number">
+          <field name="NUM">100</field>
+        </block>
+      </value>
+    </block>
+    <block type="math_random_int">
+      <value name="FROM">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+      <value name="TO">
+        <block type="math_number">
+          <field name="NUM">100</field>
+        </block>
+      </value>
+    </block>
+    <block type="math_random_float"></block>
+  </category>
+  <category name="Text">
+    <block type="text"></block>
+    <block type="text_join"></block>
+    <block type="text_append">
+      <value name="TEXT">
+        <block type="text"></block>
+      </value>
+    </block>
+    <block type="text_length"></block>
+    <block type="text_isEmpty"></block>
+    <block type="text_indexOf">
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR">text</field>
+        </block>
+      </value>
+    </block>
+    <block type="text_charAt">
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR">text</field>
+        </block>
+      </value>
+    </block>
+    <block type="text_getSubstring">
+      <value name="STRING">
+        <block type="variables_get">
+          <field name="VAR">text</field>
+        </block>
+      </value>
+    </block>
+    <block type="text_changeCase"></block>
+    <block type="text_trim"></block>
+    <block type="text_print"></block>
+    <block type="text_prompt_ext">
+      <value name="TEXT">
+        <block type="text"></block>
+      </value>
+    </block>
+  </category>
+  <category name="Lists">
+    <block type="lists_create_empty"></block>
+    <block type="lists_create_with"></block>
+    <block type="lists_repeat">
+      <value name="NUM">
+        <block type="math_number">
+          <field name="NUM">5</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_length"></block>
+    <block type="lists_isEmpty"></block>
+    <block type="lists_indexOf">
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_getIndex">
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_setIndex">
+      <value name="LIST">
+        <block type="variables_get">
+          <field name="VAR">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_getSublist">
+      <value name="LIST">
+        <block type="variables_get">
+          <field name="VAR">list</field>
+        </block>
+      </value>
+    </block>
+  </category>
+  <category name="Colour">
+    <block type="colour_picker"></block>
+    <block type="colour_random"></block>
+    <block type="colour_rgb">
+      <value name="RED">
+        <block type="math_number">
+          <field name="NUM">100</field>
+        </block>
+      </value>
+      <value name="GREEN">
+        <block type="math_number">
+          <field name="NUM">50</field>
+        </block>
+      </value>
+      <value name="BLUE">
+        <block type="math_number">
+          <field name="NUM">0</field>
+        </block>
+      </value>
+    </block>
+    <block type="colour_blend">
+      <value name="COLOUR1">
+        <block type="colour_picker">
+          <field name="COLOUR">#ff0000</field>
+        </block>
+      </value>
+      <value name="COLOUR2">
+        <block type="colour_picker">
+          <field name="COLOUR">#3333ff</field>
+        </block>
+      </value>
+      <value name="RATIO">
+        <block type="math_number">
+          <field name="NUM">0.5</field>
+        </block>
+      </value>
+    </block>
+  </category>
+  <category name="Variables" custom="VARIABLE"></category>
+  <category name="Functions" custom="PROCEDURE"></category>
+  <category name="Maze variables">
+  <block type="turn"></block>
+  <block type="can_move"></block>
+	<block type="move_ahead"></block>
+	<block type="repeat_forever"></block>
+	<block type="not_goal_reached"></block>
+
+</category>
+
+
+</xml>
+</body>
+
+<script>
+
+
+
+ Blockly.Blocks['turn'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Turn")
+        .appendField(new Blockly.FieldDropdown([["left","left"], ["right","right"]]), "DIR");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('');
+     }
+};
+
+Blockly.JavaScript['turn'] = function(block) {
+  // TODO: Assemble JavaScript into code variable.
+  var argument = block.getFieldValue('DIR')
+  var code = 'move_' + argument + '();\n';
+  return code;
+};
+
+
+Blockly.Blocks['move_ahead'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Move ahead");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['move_ahead'] = function(block) {
+  // TODO: Assemble JavaScript into code variable.
+  var code = 'move_forward();\n';
+  return code;
+};
+
+Blockly.Blocks['not_goal_reached'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("not at goal")
+    this.setOutput(true, "Boolean");
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['not_goal_reached'] = function(block) {
+  
+  var code = 'not_done()';
+  // TODO: Change ORDER_NONE to the correct strength.
+  //console.log(code)
+  return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+};
+
+
+
+Blockly.Blocks['can_move'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Can move")
+        .appendField(new Blockly.FieldDropdown([["left","left"], ["right","right"]]), "DIR");
+    this.setOutput(true, "Boolean");
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['can_move'] = function(block) {
+  var argument = block.getFieldValue('DIR')
+  var code = 'can_move_' + argument + '()';
+  // TODO: Change ORDER_NONE to the correct strength.
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['repeat_forever'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("While not at goal");
+    this.appendStatementInput("DO")
+        .appendField("Do");
+
+    this.setPreviousStatement(true);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('');
+  }
+};
+
+
+
+Blockly.JavaScript['repeat_forever'] = function(block) {
+  var branch = Blockly.JavaScript.statementToCode(block, 'DO');
+  // TODO: Assemble JavaScript into code variable.
+  //if (Blockly.JavaScript.INFINITE_LOOP_TRAP) {
+  //  branch = Blockly.JavaScript.INFINITE_LOOP_TRAP.replace(/%1/g,
+  //     '\'block_id_' + block.id + '\'') + branch;
+  //  console.log(branch);
+  //}
+
+  var code = 'while (' + 'not_done()' + ') {' + branch + '}';
+  console.log(code)
+  return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+
+};
+
+
+var workspace = Blockly.inject('blocklyDiv',
+      {toolbox: document.getElementById('toolbox')});
+
+  
+  
+  workspace.clearUndo();
+
+  //workspace.addChangeListener(runJS);
+
+  initInterpreter = function(interpreter, scope) {
+  // API
+  var wrapper;
+  wrapper = function() {
+    move_left();
+  };
+  interpreter.setProperty(scope, 'move_left',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function() {
+    move_right();
+  };
+  interpreter.setProperty(scope, 'move_right',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function() {
+    move_forward();
+  };
+  interpreter.setProperty(scope, 'move_forward',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function() {
+    can_move_left();
+  };
+  interpreter.setProperty(scope, 'can_move_left',
+      interpreter.createNativeFunction(wrapper));
+
+    wrapper = function() {
+    can_move_right();
+  };
+  interpreter.setProperty(scope, 'can_move_right',
+      interpreter.createNativeFunction(wrapper));
+
+   wrapper = function() {
+    not_done();
+  };
+  interpreter.setProperty(scope, 'not_done',
+      interpreter.createNativeFunction(wrapper));
+
+  wrapper = function() {
+    not_goal_reached();
+  };
+  interpreter.setProperty(scope, 'not_goal_reached',
+      interpreter.createNativeFunction(wrapper));
+
+  var wrapper = function(id) {
+    id = id ? id.toString() : '';
+    return interpreter.createPrimitive(workspace.highlightBlock(id));
+  };
+  interpreter.setProperty(scope, 'highlightBlock',
+      interpreter.createNativeFunction(wrapper));
+
+};
+
+  function highlightBlock(id) {
+  workspace.highlightBlock(id);
+}
+
+Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+Blockly.JavaScript.addReservedWords('highlightBlock');
+</script>
+
+
+
+
+
+</html> 
